@@ -11,6 +11,8 @@ import shutil
 
 from slidectl.workspace import Workspace
 from slidectl.config import Config
+from slidectl.ingest import MarkdownIngestor
+from slidectl.logger import Logger
 
 app = typer.Typer(
     name="slidectl",
@@ -93,10 +95,60 @@ def init(
 def ingest(
     ws: Path = typer.Option(Path("./workspace"), "--ws", help="ワークスペースディレクトリ"),
     input_file: Path = typer.Option(..., "--in", help="入力Markdownファイル"),
+    json_output: bool = typer.Option(False, "--json", help="JSON形式で出力"),
 ):
     """Markdown正規化・構造解析"""
-    rprint("[yellow]🚧 ingest コマンドは未実装です[/yellow]")
-    raise typer.Exit(1)
+    workspace = Workspace(ws)
+    logger = Logger(workspace.get_logs_dir(), step="ingest", json_mode=json_output)
+
+    try:
+        # ワークスペースの存在確認
+        if not workspace.exists():
+            rprint(f"[red]❌ Error: Workspace not found at {ws}[/red]")
+            rprint("[yellow]💡 Run 'slidectl init' first to create workspace[/yellow]")
+            raise typer.Exit(2)
+
+        # 入力ファイルの存在確認
+        if not input_file.exists():
+            logger.error(f"Input file not found: {input_file}")
+            rprint(f"[red]❌ Error: Input file not found: {input_file}[/red]")
+            raise typer.Exit(2)
+
+        logger.info(f"Starting ingest process for: {input_file}")
+        rprint(f"[blue]📄 Processing Markdown file: {input_file}[/blue]")
+
+        # Markdown処理
+        ingestor = MarkdownIngestor()
+        normalized, structure = ingestor.process(input_file)
+
+        # 出力ファイルを保存
+        output_dir = workspace.get_ingest_dir()
+        normalized_path, structure_path = ingestor.save_outputs(output_dir, normalized, structure)
+
+        logger.info(
+            "Ingest completed",
+            sections=len(structure.sections),
+            slides_hint=sum(len(s.slides_hint) for s in structure.sections),
+        )
+
+        rprint("[green]✅ Ingest completed successfully![/green]")
+        rprint("\n[dim]Outputs:[/dim]")
+        rprint(f"  • {normalized_path}")
+        rprint(f"  • {structure_path}")
+        rprint("\n[dim]Structure:[/dim]")
+        rprint(f"  • Document: {structure.doc_title}")
+        rprint(f"  • Sections: {len(structure.sections)}")
+        total_hints = sum(len(s.slides_hint) for s in structure.sections)
+        rprint(f"  • Slide hints: {total_hints}")
+
+    except FileNotFoundError as e:
+        logger.error(f"File not found: {e}")
+        rprint(f"[red]❌ Error: {e}[/red]")
+        raise typer.Exit(2)
+    except Exception as e:
+        logger.error(f"Ingest failed: {e}")
+        rprint(f"[red]❌ Error during ingest: {e}[/red]")
+        raise typer.Exit(2)
 
 
 @app.command()
