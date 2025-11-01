@@ -7,8 +7,10 @@ Typerベースのコマンドラインインターフェース
 import typer
 from rich import print as rprint
 from pathlib import Path
+import shutil
 
 from slidectl.workspace import Workspace
+from slidectl.config import Config
 
 app = typer.Typer(
     name="slidectl",
@@ -39,6 +41,28 @@ def init(
         # ワークスペースを初期化
         workspace.initialize(force=force)
 
+        # デフォルト設定ファイルをコピー
+        config_dir = workspace.get_config_dir()
+
+        # プロジェクトルートの config/ からコピー
+        project_root = Path(__file__).parent.parent.parent
+        default_config_dir = project_root / "config"
+
+        if default_config_dir.exists():
+            # layouts.yaml をコピー
+            layouts_src = default_config_dir / "layouts.yaml"
+            if layouts_src.exists():
+                shutil.copy(layouts_src, config_dir / "layouts.yaml")
+
+            # policy.json をコピー
+            policy_src = default_config_dir / "policy.json"
+            if policy_src.exists():
+                shutil.copy(policy_src, config_dir / "policy.json")
+        else:
+            # デフォルト設定をコード内から生成
+            (config_dir / "layouts.yaml").write_text(Config.get_default_layouts_yaml())
+            (config_dir / "policy.json").write_text(Config.get_default_policy_json())
+
         rprint("[green]✅ Workspace initialized successfully![/green]")
         rprint("\n[dim]Created directories:[/dim]")
         rprint("  • config/")
@@ -51,6 +75,10 @@ def init(
         rprint("  • out/")
         rprint("  • .state/")
         rprint("  • .logs/")
+
+        rprint("\n[dim]Configuration files:[/dim]")
+        rprint("  • config/layouts.yaml")
+        rprint("  • config/policy.json")
 
     except FileExistsError:
         rprint(f"[red]❌ Error: Workspace already exists at {ws}[/red]")

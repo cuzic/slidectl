@@ -1,0 +1,10 @@
+{
+  "density_range": [0.012, 0.018],
+  "whitespace_range": [0.15, 0.40],
+  "max_iterations": 3,
+  "commands": {
+    "instruct_cmd": "echo 'LLM CLI not configured'",
+    "build_cmd": "echo 'LLM CLI not configured'",
+    "augment_cmd": "echo 'LLM CLI not configured'"
+  }
+}

@@ -1,0 +1,15 @@
+layouts:
+  text-only:
+    max_lines: 18
+    prefer_assets: false
+
+  two-column:
+    left_max_lines: 10
+    right_max_lines: 10
+
+  image-right:
+    text_max_lines: 12
+    image_width_pct: 40
+
+  quote-slide:
+    max_lines: 6
