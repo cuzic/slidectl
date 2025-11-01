@@ -109,6 +109,53 @@ mise run format
 mise run clean
 ```
 
+## 開発
+
+### TDD サイクルで開発
+
+このプロジェクトはTDD（Test-Driven Development）で開発されています。
+カスタムスラッシュコマンドを使って、効率的に開発できます。
+
+#### TDDサイクル
+
+```
+PLAN → RED → GREEN → REFACTOR → VERIFY → DOCUMENT
+ 📋     🔴     🟢       🔧         ✅         📝
+```
+
+#### 使い方
+
+```bash
+# 1. 実装計画を立てる
+/plan
+
+# 2. テストを書く（失敗するテスト）
+/red
+
+# 3. 実装する（テストをパス）
+/green
+
+# 4. リファクタリング
+/refactor
+
+# 5. 品質確認
+/verify
+
+# 6. ドキュメント化とコミット
+/document
+```
+
+詳細は [.claude/commands/README.md](.claude/commands/README.md) を参照してください。
+
+### GitHub Issues
+
+実装すべき機能は [GitHub Issues](https://github.com/cuzic/slidectl/issues) で管理されています。
+
+- **Epic Issues**: 大きな機能単位（#1〜#4）
+- **Feature Issues**: 個別の実装タスク（#5〜#23）
+
+実装の順序は issues の説明を参照してください。
+
 ## ドキュメント
 
 詳細な仕様は以下を参照してください：
