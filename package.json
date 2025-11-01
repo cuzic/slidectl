@@ -1,0 +1,12 @@
+{
+  "name": "slidectl",
+  "version": "0.1.0",
+  "description": "slidectl Node.js dependencies",
+  "private": true,
+  "scripts": {
+    "marp": "marp"
+  },
+  "devDependencies": {
+    "@marp-team/marp-cli": "^3.4.0"
+  }
+}

@@ -23,6 +23,92 @@ slidectlは、Markdown形式の講演原稿から高品質なスライドを自�
 - **DOM解析・計測**: Playwright (Chromium)
 - **CLI**: Typer
 
+## セットアップ
+
+### 前提条件
+
+- [mise](https://mise.jdx.dev/) - ランタイム管理ツール
+- [uv](https://docs.astral.sh/uv/) - Python パッケージマネージャー
+
+### インストール
+
+```bash
+# リポジトリをクローン
+git clone https://github.com/cuzic/slidectl.git
+cd slidectl
+
+# Python と Node.js をインストール
+mise install
+
+# 依存関係をインストール（uv venv, pip install, playwright install, npm install）
+mise run setup
+```
+
+### 動作確認
+
+```bash
+# CLIヘルプを表示
+uv run slidectl --help
+
+# バージョン確認
+uv run slidectl --version
+
+# 利用可能な mise タスクを確認
+mise tasks
+```
+
+## 使い方
+
+### ワークスペースの初期化（未実装）
+
+```bash
+mise run init
+# または
+uv run slidectl init --ws workspace
+```
+
+### パイプライン全体の実行（未実装）
+
+```bash
+mise run pipeline
+```
+
+これは以下のコマンドを順次実行します：
+
+1. `ingest` - 原稿の構造化
+2. `instruct` - LLMへの指示生成
+3. `build` - Marpスライド生成
+4. `render` - HTML/PPTX レンダリング
+5. `measure` - 品質測定
+6. `optimize` - 最適化ループ（最大3回）
+7. `export` - 最終PPTX出力
+
+### 個別コマンド実行（未実装）
+
+```bash
+# 原稿の構造解析
+uv run slidectl ingest --ws workspace --in doc/raw.md
+
+# 状態確認
+uv run slidectl status --ws workspace
+```
+
+### 開発タスク
+
+```bash
+# テスト実行
+mise run test
+
+# Linter実行
+mise run lint
+
+# コードフォーマット
+mise run format
+
+# ワークスペースをクリーンアップ
+mise run clean
+```
+
 ## ドキュメント
 
 詳細な仕様は以下を参照してください：

@@ -1,0 +1,75 @@
+[tools]
+python = "3.11.9"
+node = "20.18.0"
+
+[tasks.setup]
+description = "Initial setup: install dependencies"
+run = """
+#!/bin/bash
+set -e
+echo "📦 Setting up slidectl development environment..."
+
+# Create uv virtual environment
+uv venv
+
+# Install Python dependencies
+uv pip install -e ".[dev]"
+
+# Install Playwright browsers
+uv run python -m playwright install chromium
+
+# Install marp-cli globally
+npm install -g @marp-team/marp-cli
+
+echo "✅ Setup complete!"
+"""
+
+[tasks.init]
+description = "Initialize workspace and config"
+run = "uv run slidectl init --ws workspace"
+
+[tasks.pipeline]
+description = "Run complete slide generation pipeline"
+run = """
+uv run slidectl ingest --ws workspace --in doc/raw.md && \
+uv run slidectl instruct --ws workspace && \
+uv run slidectl build --ws workspace && \
+uv run slidectl render --ws workspace && \
+uv run slidectl measure --ws workspace && \
+uv run slidectl optimize --ws workspace --max-iter 3 && \
+uv run slidectl export --ws workspace --pptx-name presentation.pptx
+"""
+
+[tasks.status]
+description = "Check workspace status"
+run = "uv run slidectl status --ws workspace --json | jq ."
+
+[tasks.clean]
+description = "Clean workspace and artifacts"
+run = """
+rm -rf workspace/ out/ .logs/
+echo "✅ Workspace cleaned"
+"""
+
+[tasks.test]
+description = "Run tests"
+run = "uv run pytest tests/ -v"
+
+[tasks.lint]
+description = "Run linters"
+run = """
+uv run ruff check src/
+uv run black --check src/
+uv run mypy src/
+"""
+
+[tasks.format]
+description = "Format code"
+run = """
+uv run black src/
+uv run ruff check --fix src/
+"""
+
+[tasks.dev]
+description = "Run development server / interactive mode"
+run = "uv run slidectl --help"
